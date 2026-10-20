@@ -1,30 +1,5 @@
 {
-  "version": 2,
-  "cleanUrls": true,
-  "routes": [
-    {
-      "src": "^/viewer$",
-      "dest": "/frontend/viewer.html"
-    },
-    {
-      "src": "^/viewer\\.html$",
-      "dest": "/frontend/viewer.html"
-    },
-    {
-      "src": "^/css/(.*)",
-      "dest": "/frontend/css/$1"
-    },
-    {
-      "src": "^/js/(.*)",
-      "dest": "/frontend/js/$1"
-    },
-    {
-      "src": "^/$",
-      "dest": "/frontend/index.html"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/frontend/$1"
-    }
-  ]
+  "framework": "vite",
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist"
 }
