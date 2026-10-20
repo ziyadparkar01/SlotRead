@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SlothRead — Privacy-First Offline Research &amp; EPUB Synthesizer</title>
+  <meta name="description" content="100% offline synthesizer for EPUB books and dense research PDFs via local Ollama open-weight LLMs. Exactly 3 takeaways, interactive glossaries, and 60-second conversational voice recaps.">
+  <link rel="stylesheet" href="css/style.css">
+  <!-- Three.js CDN (r128) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+<body>
+  <!-- 3D Interactive Torus Knot & Particle Background -->
+  <canvas id="bg-canvas"></canvas>
+
+  <div class="app-container">
+    <!-- Top Navigation Bar -->
+    <header class="top-bar">
+      <a href="index.html" class="brand-zone">
+        <div class="brand-icon">
+          <!-- Geometric Sloth Motif SVG -->
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"></path>
+            <path d="M8 14s1.5 2 4 2 4-2 4-2"></path>
+            <circle cx="9" cy="9" r="1.2" fill="currentColor"></circle>
+            <circle cx="15" cy="15" r="1.2" fill="currentColor"></circle>
+            <path d="M7 6l2 2m8-2l-2 2"></path>
+          </svg>
+        </div>
+        <span class="brand-name">SlothRead</span>
+        <span class="brand-tagline">/ Slow &amp; Steady Synthesizer</span>
+      </a>
+
+      <nav class="nav-links">
+        <a href="#how-it-works">How It Works</a>
+        <a href="#philosophy">The Manifesto</a>
+        <a href="viewer.html?doc_id=demo-attention">Sample Deck</a>
+        <a href="https://github.com/topics/hacktoberfest" target="_blank" rel="noopener noreferrer">Hacktoberfest 2026</a>
+      </nav>
+
+      <div class="action-zone">
+        <div class="daemon-indicator" id="daemon-indicator" title="Ollama Local Daemon Connection Status">
+          <div class="status-dot offline" id="daemon-dot"></div>
+          <span id="daemon-status-text">Ollama: Checking...</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Hero Section -->
+    <main>
+      <section class="hero-section">
+        <div class="hacktoberfest-strip">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+          </svg>
+          Hacktoberfest Week 3 · International Sloth Day Edition
+        </div>
+
+        <h1 class="hero-title">Dense reading. Distilled calmly.</h1>
+
+        <p class="hero-subtitle">
+          Stop skimming. SlothRead converts dense academic PDFs and EPUB books into high-impact executive presentation decks with <strong>3 takeaways per chapter</strong>, <strong>interactive technical glossaries</strong>, and <strong>60-second voice recaps</strong> — 100% locally on your machine via Ollama.
+        </p>
+
+        <div class="hero-metadata-row">
+          <span>Zero Cloud Egress</span>
+          <span>·</span>
+          <span>Open-Weight Local LLMs</span>
+          <span>·</span>
+          <span>100% Free &amp; Sovereign</span>
+        </div>
+      </section>
+
+      <!-- Ingestion Dropzone -->
+      <section class="dropzone-container">
+        <div class="dropzone" id="dropzone" tabindex="0" role="button" aria-label="Drop PDF or EPUB document here">
+          <div class="dropzone-glow"></div>
+
+          <div class="dropzone-icon-box">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="12" y1="18" x2="12" y2="12"></line>
+              <polyline points="9 15 12 12 15 15"></polyline>
+            </svg>
+          </div>
+
+          <h2 class="dropzone-heading">Drop your research paper or EPUB here</h2>
+          <p class="dropzone-hint">Supports PDF (.pdf) and EPUB (.epub) files up to 50MB</p>
+
+          <input type="file" id="file-input" class="dropzone-file-input" accept=".pdf,.epub">
+
+          <button type="button" class="btn-upload" id="btn-upload-file">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="17 8 12 3 7 8"></polyline>
+              <line x1="12" y1="3" x2="12" y2="15"></line>
+            </svg>
+            Select Document
+          </button>
+
+          <!-- Preset Demonstrations for Instant Trial -->
+          <div class="presets-box">
+            <span class="presets-label">Instant Demonstrations:</span>
+            <div id="presets-container" style="display: inline-flex; gap: 8px; flex-wrap: wrap;">
+              <button type="button" class="preset-chip" data-demo-id="demo-attention">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                  <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                </svg>
+                Attention Is All You Need (PDF)
+              </button>
+              <button type="button" class="preset-chip" data-demo-id="demo-sloth">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
+                </svg>
+                The Sloth Manifesto (EPUB)
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Real-time Progress HUD -->
+        <div class="progress-hud" id="progress-hud">
+          <div class="hud-top-row">
+            <div class="hud-stage">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation: spin 2s linear infinite;">
+                <circle cx="12" cy="12" r="10" stroke-opacity="0.25"></circle>
+                <path d="M12 2a10 10 0 0 1 10 10"></path>
+              </svg>
+              <span id="hud-stage">Preparing local synthesis environment...</span>
+            </div>
+            <div class="hud-percentage" id="hud-percentage">0%</div>
+          </div>
+
+          <div class="progress-bar-track">
+            <div class="progress-bar-fill" id="progress-bar-fill"></div>
+          </div>
+
+          <div class="hud-details">
+            <span id="hud-doc-name">document.pdf</span>
+            <span>Target: Ollama qwen2.5:3b</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Three Core Features Grid -->
+      <section class="feature-grid" id="how-it-works">
+        <div class="glass-card feature-card">
+          <div class="feature-number">01. THE RULE OF THREE</div>
+          <h3 class="feature-title">Exactly 3 High-Impact Takeaways</h3>
+          <p class="feature-desc">
+            No endless summaries or wall-of-text skims. Every section is rigorously constrained to three decisive conceptual breakthroughs with verified empirical relevance.
+          </p>
+        </div>
+
+        <div class="glass-card feature-card">
+          <div class="feature-number">02. ACTIVE VOCABULARY</div>
+          <h3 class="feature-title">Interactive Technical Glossary</h3>
+          <p class="feature-desc">
+            Complex terms and mathematical notation become interactive hover chips with in-situ definitions, eradicating cognitive friction and tab-switching fatigue.
+          </p>
+        </div>
+
+        <div class="glass-card feature-card">
+          <div class="feature-number">03. AUDITORY RETENTION</div>
+          <h3 class="feature-title">60-Second Conversational Recap</h3>
+          <p class="feature-desc">
+            Engage dual-coding cognitive reinforcement. Each chapter features a conversational voice script synthesized natively with your browser's zero-latency Web Speech API.
+          </p>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="app-footer" id="philosophy">
+      <div>
+        SlothRead · Hacktoberfest Week 3 &amp; International Sloth Day Edition · 100% Offline &amp; Open Source
+      </div>
+      <div class="footer-links">
+        <a href="viewer.html?doc_id=demo-attention">Executive Deck</a>
+        <a href="https://ollama.ai" target="_blank" rel="noopener noreferrer">Get Ollama</a>
+        <a href="https://github.com" target="_blank" rel="noopener noreferrer">Source Code</a>
+      </div>
+    </footer>
+  </div>
+
+  <style>
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+  </style>
+
+  <!-- Application Scripts -->
+  <script src="js/three-bg.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

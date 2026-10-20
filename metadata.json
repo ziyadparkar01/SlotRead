@@ -1,0 +1,6 @@
+{
+  "name": "SlothRead",
+  "description": "Privacy-first, 100% offline synthesizer for EPUB books and dense research PDFs using local open-weight LLMs via Ollama.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
